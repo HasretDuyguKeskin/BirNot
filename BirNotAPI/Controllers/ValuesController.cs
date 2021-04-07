@@ -15,6 +15,7 @@ namespace BirNotAPI.Controllers
         {
             return new string[] { "deger1", "deger2" };
 
+            // startup.cs - app.UseCors(CorsOptions.AllowAll);   Windows.Owin kurulduktan sonra eklenir.
         }
 
         // GET api/values/5
