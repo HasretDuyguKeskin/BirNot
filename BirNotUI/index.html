@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <script src="Scripts/jquery-3.6.0.min.js"></script>
+    <script>
+        $.ajax({
+            type: "get",
+            url: "https://localhost:44328/api/Values",
+            headers: {
+                Authorization: "Bearer 0wn0PfS-kI_hNJh3mmZNd8WJihEbeNVo_Okr7qMdlm2d0K1XCN3lMLpQ0USQ9ur0iejfLGrTu7NjdWE6mxFnKOcNg_MjA1YqRTiM7fHVgNzKQiGQQOinaRsFTcBOsC4JCaPKiSwqyYox5ecGW4IyRaYfM-AY8vZXWFjXK_G6eQXcMMTmmCM9XWju3wyoRt5OXbPWlRuiLyjJm1DcXSiWWHG2CqXQ6OIL2binZisl_WCbfbaFTRj_zOaX9MRQTN0ym0VBlJySlVlidR2sjPRZ6fZBDgNykwQ48xNBYYC_C9LTsVAH9Vk2xMJUOb_kHFaA47rNDFZmIjsPXozTCAuIrv4lg9wWzkX80Vevq8BRRenavkishL8jqf-bGnW7immztG14jPtN6GzRQYMhvh_ViQZ6yVDz5G2KZVLQbQxznX4whtOrDzBkW19wiX9frHGqHSse_Vgo2cQyHG_PwVjsrb550div5-xhCUZPgDGgQkw"
+            },
+            success: function (data) {
+                alert(data[0] + "ve" + data[1]);
+            }
+        });
+    </script>
+</body>
+</html>
