@@ -2,21 +2,71 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>BirNot</title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/site.css" rel="stylesheet" />
 </head>
 <body>
+    <div id="uyelikSayfa">
+        <form class="form-signin giris">
+            <img class="mb-4" src="Images/logo.png" alt="" width="72" height="72">
+            <div class="mb-3">
+                <div class="btn-group" id="girisKayit">
+                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="giris">Giriş Yap</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="kayit">Kayıt Ol</a>
+                </div>
+            </div>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+            <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
+            <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Confirm password" required>
+            <div class="checkbox mb-3 remember-me-div">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Giriş Yap</button>
+            <p class="mt-5 mb-3 text-muted">&copy; 2017-2021</p>
+        </form>
+    </div>
+    <div id="notlarSayfa"></div>
+
     <script src="Scripts/jquery-3.6.0.min.js"></script>
+    <script src="Scripts/bootstrap.bundle.min.js"></script>
+
     <script>
-        $.ajax({
-            type: "get",
-            url: "https://localhost:44328/api/Values",
-            headers: {
-                Authorization: "Bearer 0wn0PfS-kI_hNJh3mmZNd8WJihEbeNVo_Okr7qMdlm2d0K1XCN3lMLpQ0USQ9ur0iejfLGrTu7NjdWE6mxFnKOcNg_MjA1YqRTiM7fHVgNzKQiGQQOinaRsFTcBOsC4JCaPKiSwqyYox5ecGW4IyRaYfM-AY8vZXWFjXK_G6eQXcMMTmmCM9XWju3wyoRt5OXbPWlRuiLyjJm1DcXSiWWHG2CqXQ6OIL2binZisl_WCbfbaFTRj_zOaX9MRQTN0ym0VBlJySlVlidR2sjPRZ6fZBDgNykwQ48xNBYYC_C9LTsVAH9Vk2xMJUOb_kHFaA47rNDFZmIjsPXozTCAuIrv4lg9wWzkX80Vevq8BRRenavkishL8jqf-bGnW7immztG14jPtN6GzRQYMhvh_ViQZ6yVDz5G2KZVLQbQxznX4whtOrDzBkW19wiX9frHGqHSse_Vgo2cQyHG_PwVjsrb550div5-xhCUZPgDGgQkw"
-            },
-            success: function (data) {
-                alert(data[0] + "ve" + data[1]);
+        $("#girisKayit > a").click(function (event) {
+            event.preventDefault();
+            var a = (this);
+            $(a).addClass("active");
+            $(a).siblings("a").removeClass("active");
+            var tur = $(this).data("tur");
+            $('.form-signin button[type="submit"]').text(
+                tur == "giris" ? "Giriş Yap" : "Kayıt Ol"
+            );
+
+            switch (tur) {
+                case "giris":
+                    $(".form-signin").removeClass("kayit").addClass("giris");
+
+                    break;
+                case "kayit":
+                    $(".form-signin").removeClass("giris").addClass("kayit");
+                    break;
             }
         });
+                              //$.ajax({
+//    type: "get",
+//    url: "https://localhost:44328/api/Values",
+//    headers: {
+                     //        Authorization: "Bearer 0wn0PfS-kI_hNJh3mmZNd8WJihEbeNVo_Okr7qMdlm2d0K1XCN3lMLpQ0USQ9ur0iejfLGrTu7NjdWE6mxFnKOcNg_MjA1YqRTiM7fHVgNzKQiGQQOinaRsFTcBOsC4JCaPKiSwqyYox5ecGW4IyRaYfM-AY8vZXWFjXK_G6eQXcMMTmmCM9XWju3wyoRt5OXbPWlRuiLyjJm1DcXSiWWHG2CqXQ6OIL2binZisl_WCbfbaFTRj_zOaX9MRQTN0ym0VBlJySlVlidR2sjPRZ6fZBDgNykwQ48xNBYYC_C9LTsVAH9Vk2xMJUOb_kHFaA47rNDFZmIjsPXozTCAuIrv4lg9wWzkX80Vevq8BRRenavkishL8jqf-bGnW7immztG14jPtN6GzRQYMhvh_ViQZ6yVDz5G2KZVLQbQxznX4whtOrDzBkW19wiX9frHGqHSse_Vgo2cQyHG_PwVjsrb550div5-xhCUZPgDGgQkw"
+//    },
+                      //    success: function (data) {
+                     //        alert(data[0] + "ve" + data[1]);
+                      //    }
+                      //});
     </script>
 </body>
 </html>
