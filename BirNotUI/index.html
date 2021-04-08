@@ -1,30 +1,33 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8" />
     <title>BirNot</title>
+    <link rel="icon" type="image/png" href="/Images/logo.png" />
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/toastr.min.css" rel="stylesheet" />
     <link href="Content/site.css" rel="stylesheet" />
 </head>
 <body>
     <div id="uyelikSayfa">
-        <form class="form-signin giris">
+        <form class="form-signin giris" id="frmGirisKayit">
             <img class="mb-4" src="Images/logo.png" alt="" width="72" height="72">
             <div class="mb-3">
                 <div class="btn-group" id="girisKayit">
-                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="giris">Giriş Yap</a>
-                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="kayit">Kayıt Ol</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="giris" id="switchGiris">Giriş Yap</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary" data-tur="kayit" id="switchKayit">Kayıt Ol</a>
                 </div>
             </div>
             <label for="inputEmail" class="sr-only">Email address</label>
-            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+            <input type="email" id="inputEmail" name="Email" class="form-control" placeholder="Email address" required autofocus>
             <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+            <input type="password" id="inputPassword" name="Password" class="form-control" placeholder="Password" required>
             <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
-            <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Confirm password" required>
+            <input type="password" id="inputConfirmPassword" name="ConfirmPassword" class="form-control" placeholder="Confirm password" required disabled>
             <div class="checkbox mb-3 remember-me-div">
                 <label>
-                    <input type="checkbox" value="remember-me"> Remember me
+                    <input type="checkbox" id="inputRememberMe"> Remember me
                 </label>
             </div>
             <button class="btn btn-lg btn-primary btn-block" type="submit">Giriş Yap</button>
@@ -35,8 +38,11 @@
 
     <script src="Scripts/jquery-3.6.0.min.js"></script>
     <script src="Scripts/bootstrap.bundle.min.js"></script>
+    <script src="Scripts/toastr.min.js"></script>
 
     <script>
+        var apiUrl = "https://localhost:44328/";
+
         $("#girisKayit > a").click(function (event) {
             event.preventDefault();
             var a = (this);
@@ -50,23 +56,71 @@
             switch (tur) {
                 case "giris":
                     $(".form-signin").removeClass("kayit").addClass("giris");
-
+                    $("#inputConfirmPassword").prop("disabled", true);
                     break;
                 case "kayit":
                     $(".form-signin").removeClass("giris").addClass("kayit");
+                    $("#inputConfirmPassword").prop("disabled", false);
                     break;
             }
+            $("#inputEmail").focus();
+            $("#frmGirisKayit").get(0).reset();
         });
-                              //$.ajax({
-//    type: "get",
-//    url: "https://localhost:44328/api/Values",
-//    headers: {
-                     //        Authorization: "Bearer 0wn0PfS-kI_hNJh3mmZNd8WJihEbeNVo_Okr7qMdlm2d0K1XCN3lMLpQ0USQ9ur0iejfLGrTu7NjdWE6mxFnKOcNg_MjA1YqRTiM7fHVgNzKQiGQQOinaRsFTcBOsC4JCaPKiSwqyYox5ecGW4IyRaYfM-AY8vZXWFjXK_G6eQXcMMTmmCM9XWju3wyoRt5OXbPWlRuiLyjJm1DcXSiWWHG2CqXQ6OIL2binZisl_WCbfbaFTRj_zOaX9MRQTN0ym0VBlJySlVlidR2sjPRZ6fZBDgNykwQ48xNBYYC_C9LTsVAH9Vk2xMJUOb_kHFaA47rNDFZmIjsPXozTCAuIrv4lg9wWzkX80Vevq8BRRenavkishL8jqf-bGnW7immztG14jPtN6GzRQYMhvh_ViQZ6yVDz5G2KZVLQbQxznX4whtOrDzBkW19wiX9frHGqHSse_Vgo2cQyHG_PwVjsrb550div5-xhCUZPgDGgQkw"
-//    },
-                      //    success: function (data) {
-                     //        alert(data[0] + "ve" + data[1]);
-                      //    }
-                      //});
+        $("#frmGirisKayit").submit(function (event) {
+            event.preventDefault();
+            var frm = this;
+
+            //Kayıt modu
+            if ($(frm).hasClass("kayit")) {
+                $.ajax({
+                    type: "post",
+                    url: apiUrl + "api/Account/Register",
+                    data: $(frm).serialize(),
+                    success: function (data) {
+                        frm.reset();
+                        $("#switchGiris").trigger("click");
+                        toastr.success("Hesabınız oluşturuldu. Giriş Yapabilirsiniz", "Kayıt Başarılı.");
+                    },
+                    error: function (xhr, status, error) {
+                        showErrors(xhr.responseJSON);
+                    }
+                });
+            }
+            //Giriş Modu
+            else {
+                var email = $("#inputEmail").val();
+                var password = $("#inputPassword").val();
+                $.ajax({
+                    type: "post",
+                    url: apiUrl + "token",
+                    data: { grant_type: "password", username: email, password: password },
+                    success: function (data) {
+                        var rememberMe = $("#inputRememberMe").prop("checked");
+                        var storage = rememberMe ? localStorage : sessionStorage;
+                    },
+                    error: function (xhr, status, error) {
+                        showErrors(xhr.responseJSON);
+                    }
+                });
+            }
+        });
+        function showErrors(data) {
+            if (data.ModelState) {
+                var ms = data.ModelState;
+
+                for (var key in ms) {
+                    var errors = ms[key];
+                    for (const error of errors) {
+                        toastr.error(error);
+                    }
+                }
+            }
+            else if (data.error_description) {
+                toastr.error(data.error_description)
+            }
+
+        }
+
     </script>
 </body>
 </html>
