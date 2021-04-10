@@ -69,3 +69,49 @@ form.kayit.form-signin input#inputPassword {
 form.kayit .remember-me-div {
     display: none;
 }
+
+/*ekledik*/
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+.notes-page {
+    margin-top: 3rem;
+}
+
+    .notes-page input,
+    .notes-page select,
+    .notes-page textarea {
+        max-width: initial;
+    }
+
+.notes-heading {
+    margin-top: 0rem;
+}
+
+.notes-heading-bar {
+    display: flex;
+    align-items: flex-start;
+}
+
+    .notes-heading-bar h2 {
+        margin-right: auto;
+    }

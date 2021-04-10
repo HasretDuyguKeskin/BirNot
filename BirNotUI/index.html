@@ -8,6 +8,8 @@
     <link href="Content/bootstrap.min.css" rel="stylesheet" />
     <link href="Content/toastr.min.css" rel="stylesheet" />
     <link href="Content/site.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+
 </head>
 <body>
     <div id="uyelikSayfa">
@@ -60,7 +62,35 @@
                 </ul>
             </div>
         </nav>
+        <!--ekledik-->
+        <div class="container body-content">
+            <div class="row notes-page">
+                <div class="col-md-3">
+                    <div class="notes-heading-bar">
+                        <h2 class="notes-heading">Notlar</h2>
+                        <button id="btnNew" class="btn btn-success">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="notes" class="list-group"></div>
+                </div>
+                <div class="col-md-9">
+                    <form id="frmNote" method="post" style="display:none;">
+                        <input type="hidden" id="id" name="id" />
+                        <div class="form-group">
+                            <input type="text" id="Baslik" name="Baslik" class="form-control" placeholder="Title" required maxlength="100" />
+                        </div>
+                        <div class="form-group">
+                            <textarea id="Icerik" name="Icerik" rows="10" class="form-control" placeholder="Your Note"></textarea>
+                        </div>
+                        <button type="submit" id="btnSave" class="btn btn-primary"><i class="far fa-save"></i> Kaydet</button>
+                        <button type="button" id="btnDelete" class="btn btn-danger"><i class="far fa-trash-alt"></i> Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
 
 
     <script src="Scripts/jquery-3.6.0.min.js"></script>
@@ -72,6 +102,37 @@
         var login = loginJson ? JSON.parse(loginJson) : null;
 
         var apiUrl = "https://localhost:44328/";
+        var selectedLink = null;
+
+        $("#btnNew").click(function (event) {
+            event.preventDefault();
+            yeniNot();
+        });
+
+        $("body").on("click", "#notes > a", function (event) {
+            event.preventDefault();
+            sec(this);
+        });
+
+        $("#btnDelete").click(function () {
+            var id = selectedLink.not.Id;
+            var headers = {};
+            var selectedIndex = $(selectedLink).index();
+            headers.Authorization = login.token_type + " " + login.access_token;
+            $.ajax({
+                type: "delete",
+                url: apiUrl + "api/Notlar/" + id,
+                headers: headers,
+                success: function (data) {
+                    $(selectedLink).remove();
+                    selectedLink = null;
+                    sec($("#notes > a")[selectedIndex] || $("#notes > a").last()[0]);
+                },
+                error: function (data) {
+                    toastr.error("HATA!");
+                }
+            });
+        });
 
         $("#girisKayit > a").click(function (event) {
             event.preventDefault();
@@ -96,6 +157,7 @@
             $("#inputEmail").focus();
             $("#frmGirisKayit").get(0).reset();
         });
+
         $("#frmGirisKayit").submit(function (event) {
             event.preventDefault();
             var frm = this;
@@ -146,6 +208,94 @@
             cikisYap();
         });
 
+        $("#frmNote").submit(function (event) {
+            event.preventDefault();
+            if (!selectedLink) {
+                return;
+            }
+            var headers = {};
+            headers.Authorization = login.token_type + " " + login.access_token;
+            var formData = $(this).serialize();
+            var id = selectedLink.not.Id;
+            $.ajax({
+                type: "put",
+                url: apiUrl + "api/Notlar/" + id,
+                dataType: "json",
+                data: formData,
+                headers: headers,
+                success: function (data) {
+                    notlariListele();
+                },
+                error: function (data) {
+                    toastr.error("hata")
+                }
+            });
+        });
+
+        function notlariListele() {
+            var headers = {};
+            headers.Authorization = login.token_type + " " + login.access_token;
+            $.ajax({
+                type: "get",
+                url: apiUrl + "api/Notlar",
+                headers: headers,
+                success: function (data) {
+                    $("#notes").html(" ");
+                    for (const d of data) {
+                        notEkle(d);
+                    }
+                    ilkiSec();
+                },
+                error: function (data) {
+                    toastr.error("hata")
+                }
+            });
+        }
+
+        function yeniNot() {
+            var headers = {};
+            headers.Authorization = login.token_type + " " + login.access_token;
+            $.ajax({
+                type: "post",
+                url: apiUrl + "api/Notlar",
+                data: { Baslik: "Yeni Not", Icerik: "..." },
+                headers: headers,
+                success: function (data) {
+                    notEkle(data);
+                    ilkiSec();
+                },
+                error: function (data) {
+                    toastr.error("hata")
+                }
+            });
+        }
+
+        function notEkle(not) {
+            var a = $("<a/>").attr("href", "#").text(not.Baslik).addClass("list-group-item");
+            a[0].not = not;
+            a.prependTo("#notes");
+        }
+
+        function ilkiSec() {
+            var a = $("#notes > a")[0];
+            sec(a);
+        }
+
+        function sec(a) {
+            if (!a) {
+                $("#frmNote").hide();
+                selectedLink = null;
+                return;
+            }
+            $("#frmNote").show();
+            selectedLink = a;
+            $("#notes > a").removeClass("active");
+            $(a).addClass("active");
+            $("#id").val(a.not.Id);
+            $("#Baslik").val(a.not.Baslik);
+            $("#Icerik").val(a.not.Icerik);
+        }
+
         function girisVerileriniTemizle() {
             localStorage.removeItem("login");
             sessionStorage.removeItem("login");
@@ -173,7 +323,7 @@
                 $("#cikisKullaniciAdi").text(login.userName);
                 $("#notlarSayfa").show();
                 $("#uyelikSayfa").hide();
-                //TODO: notları listele
+                notlariListele();
             } else {
                 $("#notlarSayfa").hide();
                 $("#uyelikSayfa").show();
@@ -186,7 +336,6 @@
             sayfaSec();
             toastr.success("Başarıyla çıkış yapıldı.");
         }
-
 
         sayfaSec();
     </script>
